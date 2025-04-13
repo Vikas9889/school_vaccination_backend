@@ -46,37 +46,16 @@ GET	/api/upcoming	Get upcoming drives
 ✍️ Author
 Vikas Gupta
 
-🧑‍💻 LinkedIn
-
-💬 Twitter
-
-📧 Email
 
 ⭐️ Star the Repo
 If you like the project, consider starring it ⭐️ to show your support!
 
-yaml
-Copy
-Edit
 
 ---
 
-### ✨ Tips for Extra Polish
 
-- Add a **project logo/banner** using Markdown:
-  ```md
-  ![Banner](https://your-link-to-banner-image.com/banner.png)
-Use badges for status, license, etc. (e.g., Shields.io):
 
-md
-Copy
-Edit
-![License](https://img.shields.io/badge/license-MIT-blue.svg)
-Add GIFs/screenshots to demo functionality.
 
-Use emojis 😎 for personality and quick scanning.
-
-Want help creating a banner or customizing the README for this project? Just say the word 🚀
 
 
 
