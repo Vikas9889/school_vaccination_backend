@@ -4,6 +4,8 @@ const { Op } = require('sequelize');
 // Create a vaccination drive
 exports.createDrive = async (req, res) => {
   try {
+    console.log('Request Body:', req.body); // Log the request body
+
     const { vaccineName, date, dosesAvailable, applicableClasses } = req.body;
 
     const driveDate = new Date(date);
@@ -30,6 +32,8 @@ exports.createDrive = async (req, res) => {
     const drive = await Drive.create(req.body);
     res.status(201).json(drive);
   } catch (error) {
+    console.log('Request Body:', req.body); // Log the request body
+    console.error('Error creating drive:', error); // Log the error
     res.status(400).json({ error: error.message });
   }
 };
