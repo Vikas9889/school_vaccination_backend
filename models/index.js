@@ -1,34 +1,14 @@
-const { Sequelize } = require('sequelize');
-const dbConfig = require('../config/db');
+const Sequelize = require('sequelize');
+const sequelize = require('../config/db'); // Import the Sequelize instance from db.js
 
-const sequelize = new Sequelize(dbConfig.database, dbConfig.user, dbConfig.password, {
-  host: dbConfig.host,
-  dialect: 'postgres',
-  logging: false,
-});
+// Import the models
+const Student = require('./student')(sequelize);  // Initialize the Student model with the Sequelize instance
+const Drive = require('./drive')(sequelize);  // Initialize the Drive model with the Sequelize instance
+const VaccinationRecord = require('./vaccinationRecord')(sequelize);  // Initialize the VaccinationRecord model with the Sequelize instance
 
-const Student = require('./student')(sequelize);
-const Drive = require('./drive')(sequelize);
-const VaccinationRecord = require('./vaccinationRecord')(sequelize);
+// Set up associations (optional, depending on your models)
+Drive.hasMany(Student, { foreignKey: 'driveId' });  // For example, if a Drive has many Students
+Student.belongsTo(Drive, { foreignKey: 'driveId' });  // If a Student belongs to a Drive
 
-// Associations
-Student.belongsToMany(Drive, {
-  through: VaccinationRecord,
-  foreignKey: 'studentId',
-});
-Drive.belongsToMany(Student, {
-  through: VaccinationRecord,
-  foreignKey: 'driveId',
-});
-
-VaccinationRecord.belongsTo(Student, { foreignKey: 'studentId' });
-VaccinationRecord.belongsTo(Drive, { foreignKey: 'driveId' });
-
-sequelize.sync(); // optional in production, but good for dev
-
-module.exports = {
-  sequelize,
-  Student,
-  Drive,
-  VaccinationRecord,
-};
+// Export the models and the sequelize instance
+module.exports = { sequelize, Student, Drive, VaccinationRecord };

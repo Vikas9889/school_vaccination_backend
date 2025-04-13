@@ -1,15 +1,19 @@
+// app.js
 const express = require('express');
+const bodyParser = require('body-parser');
+const driveRoutes = require('./routes/driveRoutes');  // Import routes
+const sequelize = require('./config/db');  // Import Sequelize connection
+
 const app = express();
-const studentRoutes = require('./routes/studentRoutes');
-const driveRoutes = require('./routes/driveRoutes');
-
-app.use(express.json());  // Middleware to parse JSON requests
-
-app.use('/api', studentRoutes);  // Mount student routes at /api
-app.use('/api', driveRoutes);    // Mount drive routes at /api
-
 const PORT = process.env.PORT || 3000;
 
+// Middleware to parse JSON requests
+app.use(bodyParser.json());
+
+// API Routes
+app.use('/api/drives', driveRoutes);  // Mount the drive routes
+
+// Start the server
 app.listen(PORT, () => {
-    console.log(`Server is running on port ${PORT}`);
+  console.log(`Server is running on http://localhost:${PORT}`);
 });

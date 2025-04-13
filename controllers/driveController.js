@@ -17,7 +17,9 @@ exports.createDrive = async (req, res) => {
     const overlapping = await Drive.findOne({
       where: {
         date: driveDate,
-        applicableClasses,
+        applicableClasses: {
+          [Op.like]: `%${applicableClasses}%`, // Check for partial overlap
+        },
       },
     });
 
@@ -70,6 +72,33 @@ exports.updateDrive = async (req, res) => {
 
     await Drive.update(req.body, { where: { id } });
     res.json({ message: 'Drive updated successfully' });
+  } catch (error) {
+    res.status(500).json({ error: error.message });
+  }
+};
+
+// Get all drives
+exports.getDrives = async (req, res) => {
+  try {
+    const drives = await Drive.findAll();
+    res.status(200).json(drives);
+  } catch (error) {
+    res.status(500).json({ error: error.message });
+  }
+};
+
+
+// Get drive by ID (the missing function)
+exports.getDriveById = async (req, res) => {
+  try {
+    const { id } = req.params;
+    const drive = await Drive.findByPk(id);
+
+    if (!drive) {
+      return res.status(404).json({ error: 'Drive not found' });
+    }
+
+    res.json(drive);
   } catch (error) {
     res.status(500).json({ error: error.message });
   }

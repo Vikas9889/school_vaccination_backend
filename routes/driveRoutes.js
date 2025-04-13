@@ -1,12 +1,13 @@
+// routes/driveRoutes.js
 const express = require('express');
 const router = express.Router();
 const driveController = require('../controllers/driveController');
 
 // Drive Management
-router.post('/', driveController.createDrive);
-router.get('/', driveController.getDrives);
-router.get('/upcoming', driveController.getUpcomingDrives);
-router.put('/:id', driveController.updateDrive);
-router.get('/:id', driveController.getDriveById);
+router.post('/', driveController.createDrive);      // Create a new drive
+router.get('/', driveController.getDrives);         // Get all drives
+router.get('/upcoming', driveController.getUpcomingDrives);  // Get upcoming drives
+router.put('/:id', driveController.updateDrive);    // Update a drive
+router.get('/:id', driveController.getDriveById);   // Get a drive by ID
 
 module.exports = router;

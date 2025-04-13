@@ -1,3 +1,4 @@
+// models/drive.js
 const { DataTypes } = require('sequelize');
 
 module.exports = (sequelize) => {
@@ -18,6 +19,8 @@ module.exports = (sequelize) => {
       type: DataTypes.STRING, // e.g., "5,6,7"
       allowNull: false,
     },
+  }, {
+    tableName: 'drives', // Ensure the table name is in lowercase
   });
 
   return Drive;

@@ -1,20 +1,30 @@
+// studentRoutes.js
+
 const express = require('express');
 const router = express.Router();
 
 // Import the controller functions
-const { addStudent, getAllStudents, updateStudent, deleteStudent } = require('../controllers/studentController');
+const {
+    addStudent,
+    getAllStudents,
+    updateStudent,
+    deleteStudent
+} = require('../controllers/studentController');
 
-// Define your routes and attach the respective controller functions
-// POST: Add a new student
-router.post('/students', addStudent); 
+// Route to add a new student
+// POST /api/students
+router.post('/', addStudent);
 
-// GET: Retrieve all students
-router.get('/students', getAllStudents); 
+// Route to get all students
+// GET /api/students
+router.get('/', getAllStudents);
 
-// PUT: Update a student's information (based on student ID)
-router.put('/students/:id', updateStudent); 
+// Route to update a student by ID
+// PUT /api/students/:id
+router.put('/:id', updateStudent);
 
-// DELETE: Remove a student (based on student ID)
-router.delete('/students/:id', deleteStudent);
+// Route to delete a student by ID
+// DELETE /api/students/:id
+router.delete('/:id', deleteStudent);
 
 module.exports = router;
