@@ -1,5 +1,5 @@
 // controllers/driveController.js
-const { Drive } = require('../models');
+const { Drive, Student, VaccinationRecord } = require('../models');
 const { Op } = require('sequelize');
 
 // Create a vaccination drive
@@ -102,3 +102,81 @@ exports.updateDrive = async (req, res) => {
     res.status(500).json({ error: error.message });
   }
 };
+
+// Add a new student
+exports.addStudent = async (req, res) => {
+  try {
+    const student = await Student.create(req.body);
+    res.status(201).json(student);
+  } catch (error) {
+    res.status(400).json({ error: error.message });
+  }
+};
+
+// Get all students
+exports.getAllStudents = async (req, res) => {
+  try {
+    const students = await Student.findAll();
+    res.json(students);
+  } catch (error) {
+    res.status(500).json({ error: error.message });
+  }
+};
+
+// Update a student by ID
+exports.updateStudent = async (req, res) => {
+  try {
+    const { id } = req.params;
+    const [updated] = await Student.update(req.body, { where: { id } });
+    if (!updated) return res.status(404).json({ error: 'Student not found' });
+    const student = await Student.findByPk(id);
+    res.json(student);
+  } catch (error) {
+    res.status(400).json({ error: error.message });
+  }
+};
+
+// Delete a student by ID
+exports.deleteStudent = async (req, res) => {
+  try {
+    const { id } = req.params;
+    const deleted = await Student.destroy({ where: { id } });
+    if (!deleted) return res.status(404).json({ error: 'Student not found' });
+    res.json({ message: 'Student deleted successfully' });
+  } catch (error) {
+    res.status(500).json({ error: error.message });
+  }
+};
+
+// Fetch vaccination records for a student
+exports.getVaccinationRecords = async (req, res) => {
+  try {
+    const { id } = req.params; // student id
+    const records = await VaccinationRecord.findAll({
+      where: { studentId: id },
+      include: [{ model: Drive }],
+    });
+    res.json(records);
+  } catch (error) {
+    res.status(500).json({ error: error.message });
+  }
+};
+
+// Add or update a vaccination record for a student
+exports.addOrUpdateVaccinationRecord = async (req, res) => {
+  try {
+    const { studentId, driveId, vaccinatedAt } = req.body;
+    let record = await VaccinationRecord.findOne({ where: { studentId, driveId } });
+    if (record) {
+      record.vaccinatedAt = vaccinatedAt;
+      await record.save();
+    } else {
+      record = await VaccinationRecord.create({ studentId, driveId, vaccinatedAt });
+    }
+    // Optionally update student.vaccinated = true
+    await Student.update({ vaccinated: true }, { where: { id: studentId } });
+    res.status(200).json(record);
+  } catch (error) {
+    res.status(400).json({ error: error.message });
+  }
+}

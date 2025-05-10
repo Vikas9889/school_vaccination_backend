@@ -8,23 +8,31 @@ const {
     addStudent,
     getAllStudents,
     updateStudent,
-    deleteStudent
+    deleteStudent,
+    getVaccinationRecords,
+    addOrUpdateVaccinationRecord
 } = require('../controllers/studentController');
 
 // Route to add a new student
-// POST /api/students
-router.post('/', addStudent);
+// POST /api/v1/students
+router.post('/v1/students', addStudent);
 
 // Route to get all students
-// GET /api/students
-router.get('/', getAllStudents);
+// GET /api/v1/students
+router.get('/v1/students', getAllStudents);
 
 // Route to update a student by ID
-// PUT /api/students/:id
-router.put('/:id', updateStudent);
+// PUT /api/v1/students/:id
+router.put('/v1/students/:id', updateStudent);
 
 // Route to delete a student by ID
-// DELETE /api/students/:id
-router.delete('/:id', deleteStudent);
+// DELETE /api/v1/students/:id
+router.delete('/v1/students/:id', deleteStudent);
+
+// Vaccination record routes
+// GET /api/v1/students/:id/vaccination-records
+router.get('/v1/students/:id/vaccination-records', getVaccinationRecords);
+// POST /api/v1/students/vaccination-records
+router.post('/v1/students/vaccination-records', addOrUpdateVaccinationRecord);
 
 module.exports = router;

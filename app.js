@@ -2,12 +2,13 @@
 const express = require('express');
 const bodyParser = require('body-parser');
 const driveRoutes = require('./routes/driveRoutes');  // Import routes
+const studentRoutes = require('./routes/studentRoutes'); // Import student routes
 //const sequelize = require('./config/db');  // Import Sequelize connection
 
 
 
 const app = express();
-const PORT = process.env.PORT || 3000;
+const PORT = process.env.PORT || 3005;
 
 // Middleware to parse JSON requests
 app.use(bodyParser.json());
@@ -16,6 +17,7 @@ app.use(bodyParser.json());
 // API Routes
 //app.use(driveRoutes)
 app.use('/api/drives', driveRoutes);  // Mount the drive routes
+app.use('/api', studentRoutes); // Mount the student routes
 
 // Start the server
 app.listen(PORT, () => {

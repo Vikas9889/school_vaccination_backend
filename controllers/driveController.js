@@ -4,36 +4,35 @@ const { Op } = require('sequelize');
 // Create a vaccination drive
 exports.createDrive = async (req, res) => {
   try {
-    console.log('Request Body:', req.body); // Log the request body
-
     const { vaccineName, date, dosesAvailable, applicableClasses } = req.body;
-
     const driveDate = new Date(date);
     const today = new Date();
+    today.setHours(0, 0, 0, 0); // Normalize to midnight
     const diffDays = Math.ceil((driveDate - today) / (1000 * 60 * 60 * 24));
 
+    // Enforce scheduling at least 15 days in advance
     if (diffDays < 15) {
       return res.status(400).json({ error: 'Drive must be scheduled at least 15 days in advance' });
     }
 
+    // Prevent overlapping drives for the same date and any overlapping class
+    // Split classes by comma, trim, and check for any overlap
+    const classList = applicableClasses.split(',').map(cls => cls.trim());
     const overlapping = await Drive.findOne({
       where: {
         date: driveDate,
-        applicableClasses: {
-          [Op.like]: `%${applicableClasses}%`, // Check for partial overlap
-        },
+        [Op.or]: classList.map(cls => ({
+          applicableClasses: { [Op.like]: `%${cls}%` }
+        }))
       },
     });
-
     if (overlapping) {
-      return res.status(400).json({ error: 'Overlapping drive already exists' });
+      return res.status(400).json({ error: 'Overlapping drive already exists for one or more classes on this date' });
     }
 
-    const drive = await Drive.create(req.body);
+    const drive = await Drive.create({ vaccineName, date: driveDate, dosesAvailable, applicableClasses });
     res.status(201).json(drive);
   } catch (error) {
-    console.log('Request Body:', req.body); // Log the request body
-    console.error('Error creating drive:', error); // Log the error
     res.status(400).json({ error: error.message });
   }
 };
@@ -59,21 +58,19 @@ exports.getUpcomingDrives = async (req, res) => {
   }
 };
 
-// Edit a vaccination drive
+// Edit a vaccination drive (only if not expired)
 exports.updateDrive = async (req, res) => {
   try {
     const { id } = req.params;
     const drive = await Drive.findByPk(id);
-
     if (!drive) return res.status(404).json({ error: 'Drive not found' });
-
     const today = new Date();
+    today.setHours(0, 0, 0, 0);
     const driveDate = new Date(drive.date);
-
+    driveDate.setHours(0, 0, 0, 0);
     if (driveDate < today) {
-      return res.status(400).json({ error: 'Cannot edit a past drive' });
+      return res.status(400).json({ error: 'Cannot edit a past/expired drive' });
     }
-
     await Drive.update(req.body, { where: { id } });
     res.json({ message: 'Drive updated successfully' });
   } catch (error) {
@@ -90,7 +87,6 @@ exports.getDrives = async (req, res) => {
     res.status(500).json({ error: error.message });
   }
 };
-
 
 // Get drive by ID (the missing function)
 exports.getDriveById = async (req, res) => {
@@ -111,24 +107,32 @@ exports.getDriveById = async (req, res) => {
 // Dashboard Overview API
 exports.getDashboardData = async (req, res) => {
   try {
-    const totalStudents = await Student.count();
-    const vaccinatedStudents = await Student.count({ where: { vaccinated: true } });
+    // Efficiently get total and vaccinated student counts in parallel
+    const [totalStudents, vaccinatedStudents] = await Promise.all([
+      Student.count(),
+      Student.count({ where: { vaccinated: true } })
+    ]);
     const vaccinationPercentage = totalStudents === 0 ? 0 : (vaccinatedStudents / totalStudents) * 100;
 
+    // Get upcoming drives in the next 30 days
     const today = new Date();
+    const nextMonth = new Date();
+    nextMonth.setDate(today.getDate() + 30);
     const upcomingDrives = await Drive.findAll({
       where: {
         date: {
-          [Op.between]: [today, new Date(today.getTime() + 30 * 24 * 60 * 60 * 1000)],
+          [Op.between]: [today, nextMonth],
         },
       },
+      order: [['date', 'ASC']],
     });
 
     res.json({
       totalStudents,
       vaccinatedStudents,
-      vaccinationPercentage: vaccinationPercentage.toFixed(2),
+      vaccinationPercentage: Number(vaccinationPercentage.toFixed(2)),
       upcomingDrives,
+      upcomingDrivesCount: upcomingDrives.length,
     });
   } catch (error) {
     res.status(500).json({ error: error.message });
