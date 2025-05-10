@@ -10,5 +10,11 @@ const VaccinationRecord = require('./vaccinationRecord')(sequelize);  // Initial
 Drive.hasMany(Student, { foreignKey: 'driveId' });  // For example, if a Drive has many Students
 Student.belongsTo(Drive, { foreignKey: 'driveId' });  // If a Student belongs to a Drive
 
+// Setup associations for VaccinationRecord
+VaccinationRecord.belongsTo(Student, { foreignKey: 'studentId' });
+VaccinationRecord.belongsTo(Drive, { foreignKey: 'driveId' });
+Student.hasMany(VaccinationRecord, { foreignKey: 'studentId' });
+Drive.hasMany(VaccinationRecord, { foreignKey: 'driveId' });
+
 // Export the models and the sequelize instance
 module.exports = { sequelize, Student, Drive, VaccinationRecord };

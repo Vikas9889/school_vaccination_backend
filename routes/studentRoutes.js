@@ -10,7 +10,8 @@ const {
     updateStudent,
     deleteStudent,
     getVaccinationRecords,
-    addOrUpdateVaccinationRecord
+    addOrUpdateVaccinationRecord,
+    getStudentById
 } = require('../controllers/studentController');
 
 // Route to add a new student
@@ -20,6 +21,10 @@ router.post('/v1/students', addStudent);
 // Route to get all students
 // GET /api/v1/students
 router.get('/v1/students', getAllStudents);
+
+// Route to get a student by ID
+// GET /api/v1/students/:id
+router.get('/v1/students/:id', getStudentById);
 
 // Route to update a student by ID
 // PUT /api/v1/students/:id
